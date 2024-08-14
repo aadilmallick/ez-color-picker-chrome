@@ -1,0 +1,28 @@
+{
+  "manifest_version": 3,
+  "name": "EZ Color Picker",
+  "version": "1.0.0",
+  "minimum_chrome_version": "100",
+  "action": {
+    "default_popup": "index.html",
+    "default_title": "Open color picker",
+    "default_icon": {
+      "16": "public/icon.png",
+      "32": "public/icon.png",
+      "48": "public/icon.png",
+      "128": "public/icon.png"
+    }
+  },
+  "icons": {
+    "16": "public/icon.png",
+    "32": "public/icon.png",
+    "48": "public/icon.png",
+    "128": "public/icon.png"
+  },
+  "permissions": ["storage", "activeTab", "scripting"],
+  "background": {
+    "service_worker": "src/background/background.ts",
+    "type": "module"
+  },
+  "description": "Extension for picking colors and saving them"
+}
