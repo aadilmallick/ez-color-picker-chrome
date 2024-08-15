@@ -2,31 +2,21 @@ import {
   openEyedropperChannel,
   storeColorChannel,
 } from "../background/handlers";
+import EyedropperManager from "../utils/vanillajsutils/EyedropperManager";
 
-const abortController = new AbortController();
-
-window.addEventListener("keydown", (event) => {
-  if (event.key === "Escape") {
-    abortController.abort();
-  }
-});
+const eyedropperManager = new EyedropperManager();
 
 openEyedropperChannel.listen(({ url }) => {
   console.log("open-eyedropper channel received");
-  // setTimeout is used to prevent the eye dropper from closing
+  // setTimeout is used to prevent the eye dropper from closing. The popup must be closed beforehand
   setTimeout(() => {
     handleColorPick(url);
-  }, 500);
+  }, 750);
 });
 
 async function handleColorPick(url: string) {
-  if (!window.EyeDropper) {
-    return;
+  const color = await eyedropperManager.getColor();
+  if (color) {
+    storeColorChannel.sendC2P({ url, color });
   }
-  const eyeDropper = new window.EyeDropper();
-  const result = await eyeDropper.open({
-    signal: abortController.signal,
-  });
-  console.log(result);
-  storeColorChannel.sendC2P({ url, color: result.sRGBHex });
 }

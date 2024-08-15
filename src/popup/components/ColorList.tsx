@@ -58,7 +58,7 @@ const ColorItem = ({ data }: { data: { url: string; color: string } }) => {
       onClick: async () => {
         await chrome.tabs.create({ url: data.url });
       },
-      textColor: "lightblue",
+      textColor: "steelblue",
     },
   ];
   const [isModalOpen, setIsModalOpen] = React.useState(false);
