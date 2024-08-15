@@ -1,16 +1,22 @@
+import "../styleUtils/toast.css";
 type ToastType = "info" | "success" | "danger" | "default" | "warning";
 type ToastManagerOptions = {
   timeout?: number;
+  position?: "top-right" | "top-left" | "bottom-right" | "bottom-left";
 };
 export class ToastManager {
   private toastContainer?: HTMLElement;
-  constructor(private options: ToastManagerOptions = { timeout: 3000 }) {}
+  private options: ToastManagerOptions;
+  constructor(options: ToastManagerOptions = {}) {
+    this.options = { timeout: 3000, position: "bottom-right", ...options };
+  }
 
   setup() {
     const element = document.getElementById("toasts");
     if (element) return;
     const toastContainer = document.createElement("div");
     toastContainer.id = "toasts";
+    toastContainer.classList.add(this.options.position!);
 
     // add toast container to body
     document.body.appendChild(toastContainer);
