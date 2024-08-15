@@ -1,16 +1,13 @@
 export default class EyedropperManager {
   private abortController = new AbortController();
-  private cb: (event: KeyboardEvent) => void;
+  private cb!: (event: KeyboardEvent) => void;
 
-  constructor() {
+  async getColor() {
     this.cb = (event: KeyboardEvent) => {
       if (event.key === "Escape") {
         this.abortController.abort();
       }
     };
-  }
-
-  async getColor() {
     if (window.EyeDropper) {
       const eyeDropper = new window.EyeDropper();
       window.addEventListener("keydown", this.cb);
@@ -22,6 +19,7 @@ export default class EyedropperManager {
         return result.sRGBHex;
       } catch (e) {
         window.removeEventListener("keydown", this.cb);
+        console.warn("eyedropper error", e);
         return null;
       }
     } else {

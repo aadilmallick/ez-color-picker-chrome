@@ -3,7 +3,7 @@ type Listener = (
   sender: chrome.runtime.MessageSender,
   sendResponse: (response?: any) => void
 ) => void;
-export class MessagesOneWay<T> {
+export class MessagesOneWay<T = undefined> {
   private listener: Listener | null = null;
   constructor(private channel: string) {}
 

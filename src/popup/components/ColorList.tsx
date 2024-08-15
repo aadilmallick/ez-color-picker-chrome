@@ -1,7 +1,7 @@
 import React, { useEffect } from "react";
-import { Handler, storage } from "../../background/handlers";
 import { DropDownModal, DropdownModalProps } from "../../components/Modal";
 import { useStore } from "../hooks/useStore";
+import { Handler, storage } from "../../background/storageHandlers";
 
 const ColorList = () => {
   const { colors, setColors } = useStore();

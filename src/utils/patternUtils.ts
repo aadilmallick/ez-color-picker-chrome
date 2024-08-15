@@ -24,6 +24,10 @@ export class ConcreteObserver<T> implements Observable<T> {
   }
 }
 
+export async function delay(ms: number) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
 export function createReactiveProxy<T extends Record<string, any>>(
   state: T,
   onSet: (state: T) => void

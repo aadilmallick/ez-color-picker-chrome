@@ -1,4 +1,3 @@
-import { MessagesOneWay } from "../utils/api/messages";
 import { LocalStorage } from "../utils/api/storage";
 
 export const storage = new LocalStorage({
@@ -20,12 +19,3 @@ export class Handler {
     await storage.set("savedColors", newColors);
   }
 }
-
-export const openEyedropperChannel = new MessagesOneWay<{
-  url: string;
-}>("open-eyedropper");
-
-export const storeColorChannel = new MessagesOneWay<{
-  url: string;
-  color: string;
-}>("store-color");

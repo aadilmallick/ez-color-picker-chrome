@@ -1,9 +1,11 @@
-import { openEyedropperChannel } from "../../background/handlers";
+import { openEyedropperChannel } from "../../background/messageHandlers";
 
 async function onColorPick(tab: chrome.tabs.Tab) {
-  openEyedropperChannel.sendP2C(tab.id!, {
-    url: tab.url!,
-  });
+  console.log(tab, "sending message");
+
+  // 1. send message to background script to start scripting. Pass along tab id and url
+  openEyedropperChannel.sendP2P({ tabId: tab.id!, url: tab.url! });
+  // 2. close window
   window.close();
 }
 

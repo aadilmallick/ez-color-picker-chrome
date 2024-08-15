@@ -1,4 +1,3 @@
-import "../styleUtils/toast.css";
 type ToastType = "info" | "success" | "danger" | "default" | "warning";
 type ToastManagerOptions = {
   timeout?: number;
@@ -7,6 +6,11 @@ type ToastManagerOptions = {
 export class ToastManager {
   private toastContainer?: HTMLElement;
   private options: ToastManagerOptions;
+
+  public get containerElement() {
+    return this.toastContainer;
+  }
+
   constructor(options: ToastManagerOptions = {}) {
     this.options = { timeout: 3000, position: "bottom-right", ...options };
   }
