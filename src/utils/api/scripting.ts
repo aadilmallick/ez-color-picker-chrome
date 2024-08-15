@@ -9,17 +9,38 @@ function getArray(scripts: string | string[]): string[] {
 }
 
 export default class Scripting {
-  static async executeScripts(tabId: number, scripts: string | string[]) {
+  static async executeScripts(
+    tabId: number,
+    scripts: string | string[],
+    world: "MAIN" | "ISOLATED" = "ISOLATED"
+  ) {
     await chrome.scripting.executeScript({
       files: getArray(scripts),
       target: { tabId },
+      world,
     });
   }
 
-  static async executeFunction<T>(tabId: number, cb: () => Promise<T>) {
+  /**
+   * Executing a function in the context of the DOM of page, but comes with limitations:
+   * - The function arguments must be JSON serializable. No functions or DOM elements.
+   * - The function must be self-contained and not reference anything outside of it.
+   * - The function cannot use any chrome APIs.
+   *
+   * @param tabId represents the tab to run the script in
+   * @param cb A function to run in the context of the tab
+   * @param args Any arguments you pass must be JSON-serializable and not reference anything outside.
+   * @returns
+   */
+  static async executeFunction<T, V extends Record<string, any>>(
+    tabId: number,
+    cb: (args: V) => Promise<T>,
+    args: V
+  ) {
     const result = await chrome.scripting.executeScript({
       target: { tabId },
       func: cb,
+      args: [args],
     });
     return result[0].result as T;
   }
@@ -45,6 +66,8 @@ export class ContentScriptModel {
       script: string;
       matches: string[];
       id: string;
+      css?: string[];
+      world?: "MAIN" | "ISOLATED";
     }
   ) {}
 
@@ -62,7 +85,9 @@ export class ContentScriptModel {
         id: this.scriptData.id,
         js: [this.scriptData.script],
         matches: this.scriptData.matches,
-        allFrames: true,
+        css: this.scriptData.css,
+        world: this.scriptData.world || "ISOLATED",
+        persistAcrossSessions: false,
       },
     ]);
   }
@@ -79,7 +104,6 @@ export class ContentScriptModel {
     const scripts = await chrome.scripting.getRegisteredContentScripts({
       ids: [this.scriptData.id],
     });
-    console.log(scripts);
     return scripts ? scripts[0] : undefined;
   }
 }

@@ -1,5 +1,7 @@
 import { Runtime } from "../utils/api/runtime";
-import { Handler, storage, storeColorChannel } from "./handlers";
+import { onColorPick } from "./dynamicScripts";
+import { openEyedropperChannel } from "./messageHandlers";
+import { storage } from "./storageHandlers";
 
 Runtime.onInstall({
   // runs first time you download the extension
@@ -16,10 +18,6 @@ Runtime.onInstall({
   },
 });
 
-storeColorChannel.listen(({ url, color }) => {
-  Handler.saveColorToStorage(color, url);
-});
-
-Runtime.onCleanup(() => {
-  storeColorChannel.removeListener();
+openEyedropperChannel.listen(({ tabId, url }) => {
+  onColorPick(tabId, url);
 });

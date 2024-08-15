@@ -1,7 +1,7 @@
 import React, { useEffect } from "react";
-import { Handler, storage } from "../../background/handlers";
 import { DropDownModal, DropdownModalProps } from "../../components/Modal";
 import { useStore } from "../hooks/useStore";
+import { Handler, storage } from "../../background/storageHandlers";
 
 const ColorList = () => {
   const { colors, setColors } = useStore();
@@ -58,10 +58,11 @@ const ColorItem = ({ data }: { data: { url: string; color: string } }) => {
       onClick: async () => {
         await chrome.tabs.create({ url: data.url });
       },
-      textColor: "lightblue",
+      textColor: "steelblue",
     },
   ];
   const [isModalOpen, setIsModalOpen] = React.useState(false);
+
   return (
     <div
       className="w-full border border-gray-300 shadow-sm flex items-center justify-center cursor-pointer"
