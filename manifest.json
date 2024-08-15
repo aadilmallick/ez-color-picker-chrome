@@ -19,7 +19,7 @@
     "48": "public/icon.png",
     "128": "public/icon.png"
   },
-  "permissions": ["storage", "activeTab", "scripting"],
+  "permissions": ["storage", "activeTab"],
   "background": {
     "service_worker": "src/background/background.ts",
     "type": "module"

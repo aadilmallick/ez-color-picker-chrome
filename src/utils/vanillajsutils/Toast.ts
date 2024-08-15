@@ -26,22 +26,14 @@ export class ToastManager {
   }
 
   toast(message: string, type: ToastType = "default") {
-    const toast = new Toast(message, type, this.options.timeout);
+    const toast = new Toast({
+      message,
+      type,
+      duration: this.options.timeout,
+    });
     if (!this.toastContainer) throw new Error("Toast container not set");
     this.toastContainer.appendChild(toast.element);
-    setTimeout(() => {
-      // run exit animation
-      const animation = toast.element.animate(
-        [{ opacity: 0, transform: "translateX(250px)" }],
-        {
-          duration: 250,
-        }
-      );
-      // wait for animation to finish
-      animation.onfinish = () => {
-        toast.element.remove();
-      };
-    }, this.options.timeout);
+    toast.show();
   }
 
   success(message: string) {
@@ -63,7 +55,19 @@ export class ToastManager {
 
 class Toast {
   public element: HTMLElement;
-  constructor(message: string, type: ToastType = "default", duration = 3000) {
+  private timeoutId: number | null = null;
+  private duration: number;
+  constructor({
+    message,
+    duration = 3000,
+    type = "default",
+    onClick,
+  }: {
+    message: string;
+    type?: ToastType;
+    duration?: number;
+    onClick?: () => void;
+  }) {
     const toast = document.createElement("div");
     toast.classList.add("toast");
     toast.classList.add(`toast-${type}`);
@@ -71,5 +75,46 @@ class Toast {
     toast.innerText = message;
 
     this.element = toast;
+    this.duration = duration;
+
+    this.element.addEventListener(
+      "click",
+      (e) => {
+        e.stopPropagation();
+        onClick?.();
+        this.dismiss();
+      },
+      {
+        once: true,
+      }
+    );
+  }
+
+  animateOut() {
+    const animation = this.element.animate(
+      [{ opacity: 0, transform: "translateX(250px)" }],
+      {
+        duration: 250,
+      }
+    );
+    // wait for animation to finish
+    animation.onfinish = () => {
+      this.element.remove();
+    };
+  }
+
+  show() {
+    this.timeoutId = setTimeout(() => {
+      this.animateOut();
+      this.timeoutId = null;
+    }, this.duration);
+  }
+
+  dismiss() {
+    if (this.timeoutId) {
+      clearTimeout(this.timeoutId);
+      this.timeoutId = null;
+      this.animateOut();
+    }
   }
 }

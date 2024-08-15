@@ -79,7 +79,6 @@ export class ContentScriptModel {
     const scripts = await chrome.scripting.getRegisteredContentScripts({
       ids: [this.scriptData.id],
     });
-    console.log(scripts);
     return scripts ? scripts[0] : undefined;
   }
 }

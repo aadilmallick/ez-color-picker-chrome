@@ -6,13 +6,10 @@ import EyedropperManager from "../utils/vanillajsutils/EyedropperManager";
 import { ToastManager } from "../utils/vanillajsutils/Toast";
 
 const eyedropperManager = new EyedropperManager();
-const toaster = new ToastManager({
-  position: "top-right",
-});
+const toaster = new ToastManager();
 toaster.setup();
 
 openEyedropperChannel.listen(({ url }) => {
-  console.log("open-eyedropper channel received");
   // setTimeout is used to prevent the eye dropper from closing. The popup must be closed beforehand
   setTimeout(() => {
     handleColorPick(url);
@@ -22,7 +19,8 @@ openEyedropperChannel.listen(({ url }) => {
 async function handleColorPick(url: string) {
   const color = await eyedropperManager.getColor();
   if (color) {
-    toaster.success("Color picked!");
+    await navigator.clipboard.writeText(color);
+    toaster.success("Color copied to clipboard!");
     storeColorChannel.sendC2P({ url, color });
   }
 }
