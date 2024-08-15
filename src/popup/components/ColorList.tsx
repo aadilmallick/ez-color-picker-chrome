@@ -62,6 +62,7 @@ const ColorItem = ({ data }: { data: { url: string; color: string } }) => {
     },
   ];
   const [isModalOpen, setIsModalOpen] = React.useState(false);
+
   return (
     <div
       className="w-full border border-gray-300 shadow-sm flex items-center justify-center cursor-pointer"

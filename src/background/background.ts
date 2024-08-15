@@ -19,7 +19,3 @@ Runtime.onInstall({
 storeColorChannel.listen(({ url, color }) => {
   Handler.saveColorToStorage(color, url);
 });
-
-Runtime.onCleanup(() => {
-  storeColorChannel.removeListener();
-});

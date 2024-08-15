@@ -1,5 +1,3 @@
-import "../utils/styleUtils/toast.css";
-
 type ToastType = "info" | "success" | "danger" | "default" | "warning";
 type ToastManagerOptions = {
   timeout?: number;

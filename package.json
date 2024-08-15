@@ -7,13 +7,10 @@
     "dev": "vite",
     "build": "vite build",
     "lint": "eslint src --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
-    "preview": "vite preview",
-    "build-dynamic-script": "vite build --config vite.dynamic_scripts.config.ts",
-    "start": "npm run build-dynamic-script && npm run dev"
+    "preview": "vite preview"
   },
   "dependencies": {
     "clsx": "^2.1.1",
-    "mellowtel": "^1.4.2",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "tailwind-merge": "^2.5.2",
