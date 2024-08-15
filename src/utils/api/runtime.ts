@@ -12,13 +12,16 @@ export const Runtime = {
     updateCb,
     chromeUpdateCb,
     onExtensionUnInstalledUrl,
+    onAll,
   }: {
     installCb?: () => void;
     updateCb?: () => void;
     chromeUpdateCb?: () => void;
+    onAll?: () => void;
     onExtensionUnInstalledUrl?: string;
   }) {
     chrome.runtime.onInstalled.addListener(({ reason }) => {
+      onAll?.();
       switch (reason) {
         case chrome.runtime.OnInstalledReason.INSTALL:
           onExtensionUnInstalledUrl &&

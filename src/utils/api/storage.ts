@@ -46,14 +46,18 @@ abstract class Storage<T extends Record<string, any>> {
       | chrome.storage.LocalStorageArea
   ) {
     this.storage = storage;
-    this.setup();
   }
 
-  private async setup() {
+  async setup() {
     const data = await this.storage.get(this.getKeys());
     if (!data || Object.keys(data).length === 0) {
       await this.storage.set(this.defaultData);
     }
+  }
+
+  async getAll() {
+    const data = await this.storage.get(this.getKeys());
+    return data as T;
   }
 
   getKeys() {
@@ -81,7 +85,8 @@ abstract class Storage<T extends Record<string, any>> {
   }
 
   async get<K extends keyof T>(key: K) {
-    return (await this.storage.get([key])) as T[K];
+    const data = (await this.storage.get([key])) as Record<K, T[K]>;
+    return data[key] as T[K];
   }
 
   async getMultiple<K extends keyof T>(keys: K[]) {

@@ -1,121 +1,52 @@
-export class MessageModel {
-  static async sendToProcess<K extends Channels>(
-    channel: K,
-    payload: Payloads[K]
-  ) {
-    return (await chrome.runtime.sendMessage({
-      channel,
-      payload,
-    })) as Returns[K];
+type Listener = (
+  message: any,
+  sender: chrome.runtime.MessageSender,
+  sendResponse: (response?: any) => void
+) => void;
+export class MessagesOneWay<T> {
+  private listener: Listener | null = null;
+  constructor(private channel: string) {}
+
+  /**
+   * for sending message from process to another process
+   *
+   */
+  sendP2P(payload: T) {
+    chrome.runtime.sendMessage({ type: this.channel, ...payload });
   }
 
-  static async sendToContentScript<K extends Channels>(
-    channel: K,
-    payload: Payloads[K],
-    options?: {
-      tabId: number;
-      current?: false;
-    }
-  ): Promise<Returns[K] | null>;
-
-  static async sendToContentScript<K extends Channels>(
-    channel: K,
-    payload: Payloads[K],
-    options?: {
-      tabId?: number;
-      current: true;
-    }
-  ): Promise<Returns[K] | null>;
-
-  static async sendToContentScript<K extends Channels>(
-    channel: K,
-    payload: Payloads[K],
-    options?: {
-      tabId?: number;
-      current?: boolean;
-    }
-  ) {
-    if (options?.current) {
-      const [tab] = await chrome.tabs.query({
-        active: true,
-        lastFocusedWindow: true,
-      });
-      return (await chrome.tabs.sendMessage(tab.id!, {
-        channel,
-        payload,
-      })) as Returns[K] | null;
-    }
-
-    if (typeof options?.tabId === "number") {
-      return (await chrome.tabs.sendMessage(options.tabId, {
-        channel,
-        payload,
-      })) as Returns[K] | null;
-    }
+  /**
+   * for sending message from a content script to another process
+   *
+   */
+  sendC2P(payload: T) {
+    chrome.runtime.sendMessage({ type: this.channel, ...payload });
   }
 
-  static addMessageListenerAsync<K extends Channels>(
-    incomingPayload: ListenerPayloads<K>,
-    func: ReceivingMessageFuncAsync<K>
-  ) {
-    chrome.runtime.onMessage.addListener(
-      async (message: ListenerPayloads<K>, sender, sendResponse) => {
-        if (message.channel === incomingPayload.channel) {
-          const data = await func(message, sender, sendResponse);
-          sendResponse(data);
-          return true;
-        }
+  /**
+   * for sending message from a process to a content script
+   */
+  sendP2C(tabId: number, payload: T) {
+    chrome.tabs.sendMessage(tabId, { type: this.channel, ...payload });
+  }
+
+  listen(callback: (payload: T) => void) {
+    const listener: Listener = (
+      message: T & { type: string },
+      sender: any,
+      sendResponse: any
+    ) => {
+      if (message.type === this.channel) {
+        callback(message);
       }
-    );
-
-    return func;
+    };
+    this.listener = listener;
+    chrome.runtime.onMessage.addListener(this.listener);
   }
 
-  static addMessageListenerSync<K extends Channels>(
-    incomingPayload: ListenerPayloads<K>,
-    func: ReceivingMessageFuncSync<K>
-  ) {
-    chrome.runtime.onMessage.addListener(
-      (message: ListenerPayloads<K>, sender, sendResponse) => {
-        if (message.channel === incomingPayload.channel) {
-          const data = func(message, sender, sendResponse);
-          sendResponse(data);
-        }
-      }
-    );
-
-    return func;
-  }
-
-  static removeMessageListener(
-    cb: (message: any, sender: any, sendResponse: any) => void | Promise<void>
-  ) {
-    chrome.runtime.onMessage.removeListener(cb);
+  removeListener() {
+    if (this.listener) {
+      chrome.runtime.onMessage.removeListener(this.listener);
+    }
   }
 }
-
-type Channels = "contentScript:upload";
-
-type Payloads = {
-  [K in Channels]: K extends "contentScript:upload" ? { url: string } : void;
-};
-
-type ListenerPayloads<K extends Channels> = Payloads[K] & { channel: K };
-
-type Returns = {
-  [K in Channels]: K extends "contentScript:upload"
-    ? { message: string; filepath: string; framerate: number } & { channel: K }
-    : void;
-};
-
-type ReceivingMessageFuncAsync<K extends Channels> = (
-  message?: ListenerPayloads<K>,
-  sender?: chrome.runtime.MessageSender,
-  sendResponse?: (response?: any) => void
-) => Promise<Returns[K]>;
-
-type ReceivingMessageFuncSync<K extends Channels> = (
-  message?: ListenerPayloads<K>,
-  sender?: chrome.runtime.MessageSender,
-  sendResponse?: (response?: any) => void
-) => Returns[K];

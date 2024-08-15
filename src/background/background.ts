@@ -1,4 +1,5 @@
 import { Runtime } from "../utils/api/runtime";
+import { Handler, storage, storeColorChannel } from "./handlers";
 
 Runtime.onInstall({
   // runs first time you download the extension
@@ -9,4 +10,16 @@ Runtime.onInstall({
   updateCb: async () => {
     console.log("Extension updated");
   },
+  onAll: async () => {
+    console.log("Extension loaded");
+    storage.setup();
+  },
+});
+
+storeColorChannel.listen(({ url, color }) => {
+  Handler.saveColorToStorage(color, url);
+});
+
+Runtime.onCleanup(() => {
+  storeColorChannel.removeListener();
 });

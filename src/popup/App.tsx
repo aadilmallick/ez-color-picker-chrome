@@ -1,6 +1,7 @@
 import { useGetCurrentTab } from "../utils/ReactUtils";
+import ColorList from "./components/ColorList";
 import EyeDropperButton from "./components/EyeDropperButton";
-import "./index.css";
+import "./index.scss";
 
 function App() {
   const { tab } = useGetCurrentTab();
@@ -11,6 +12,7 @@ function App() {
   return (
     <div className="h-full py-2 px-1">
       <EyeDropperButton tab={tab} />
+      <ColorList />
     </div>
   );
 }

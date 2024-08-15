@@ -52,26 +52,29 @@ export function debounce(callback: CallableFunction, delay: number) {
   };
 }
 
-export class CustomEventManager<T = any> extends EventTarget {
+export class CustomEventManager<T = never> extends EventTarget {
   private listener?: EventListenerOrEventListenerObject;
   constructor(private name: string) {
     super();
   }
 
-  onTriggered(callback: (event: Event & { detail: T }) => void) {
+  onTriggered(
+    callback: (event: Event & { detail: T }) => void,
+    options?: AddEventListenerOptions
+  ) {
     this.listener = (e) => {
       callback(e as Event & { detail: T });
     };
-    this.addEventListener(this.name, this.listener);
+    this.addEventListener(this.name, this.listener, options);
   }
 
   removeListener() {
     if (this.listener) this.removeEventListener(this.name, this.listener);
   }
 
-  dispatch(data: T, eventInitDict?: CustomEventInit<T>) {
+  dispatch(options?: CustomEventInit<T> & { data?: T }) {
     this.dispatchEvent(
-      new CustomEvent(this.name, { ...eventInitDict, detail: data })
+      new CustomEvent(this.name, { ...options, detail: options?.data })
     );
   }
 }
