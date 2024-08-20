@@ -32,15 +32,14 @@ export default class Scripting {
    * @param args Any arguments you pass must be JSON-serializable and not reference anything outside.
    * @returns
    */
-  static async executeFunction<T, V extends Record<string, any>>(
-    tabId: number,
-    cb: (args: V) => Promise<T>,
-    args: V
-  ) {
+  static async executeFunction<
+    T,
+    V extends Record<string, any> = Record<string, never>
+  >(tabId: number, cb: (args?: V) => Promise<T>, args?: V) {
     const result = await chrome.scripting.executeScript({
       target: { tabId },
       func: cb,
-      args: [args],
+      args: args ? [args] : undefined,
     });
     return result[0].result as T;
   }
